@@ -15,5 +15,6 @@ Docker starten
 $ make start
 ```
 
+Über localhost sollte ihr jetzt Laravel sehen
 
 
