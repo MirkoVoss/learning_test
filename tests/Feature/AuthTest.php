@@ -10,6 +10,7 @@ class AuthTest extends TestCase {
     use DatabaseTransactions;
 
     public string $email = 'test@test.de';
+    public string $password = '12345678';
 
     public function test_registerSuccessfully() {
         $faker        = Faker::create();
@@ -229,5 +230,164 @@ class AuthTest extends TestCase {
 
                     ],
             ];
+    }
+
+    /**
+     * @dataProvider ProviderLogin
+     */
+
+    public function test_login( $registerData, $exactJson = null, $statusCode = 422) {
+        $response = $this->post( 'api/auth/login', $registerData, [ 'Accept' => 'application/json' ]
+        );
+        $response->assertStatus( $statusCode );
+        if ($exactJson) $response->assertExactJson( $exactJson );
+    }
+
+    public function ProviderLogin() {
+        return [
+            'successfully logged in with 200' => [
+                'registerData' => [
+                    'email'    => $this->email,
+                    'password' => $this->password,
+                ],
+                'exactJson' => null,
+                'statusCode' => 200,
+            ],
+
+            'no data given' =>
+                [
+                    'registerData' => [
+                        'email'    => '',
+                        'password' => '',
+                    ],
+
+                    'exactJson' => [
+                        'message' => 'The email field is required. (and 1 more error)',
+                        'errors'  => [
+                            'email'    => [
+                                'The email field is required.',
+                            ],
+                            'password' => [
+                                'The password field is required.',
+                            ],
+                        ],
+                    ],
+
+                ],
+            'email not given' => [
+                'registerData' => [
+                    'email'    => '',
+                    'password' => '123456789',
+                ],
+
+                'exactJson' => [
+                    'message' => 'The email field is required.',
+                    'errors'  => [
+                        'email'    => [
+                            'The email field is required.',
+                        ],
+                    ],
+                ],
+
+            ],
+            'password not given' => [
+                'registerData' => [
+                    'email'    => $this->email,
+                    'password' => '',
+                ],
+
+                'exactJson' => [
+                    'message' => 'The password field is required.',
+                    'errors'  => [
+                        'password' => [
+                            'The password field is required.',
+                        ],
+                    ],
+                ],
+
+            ],
+            'email not valid' =>
+                [
+                    'registerData' => [
+                        'email'    => 'email',
+                        'password' => '123456789',
+                    ],
+
+                    'exactJson' => [
+                        'message' => 'The email must be a valid email address.',
+                        'errors'  => [
+                            'email' => [
+                                'The email must be a valid email address.',
+                            ],
+                        ],
+                    ],
+
+                ],
+            'password too short' =>
+                [
+                    'registerData' => [
+                        'email'    => $this->email,
+                        'password' => '1231',
+                    ],
+
+                    'exactJson' => [
+                        'message' => 'The password must be at least 6 characters.',
+                        'errors'  => [
+                            'password' => [
+                                'The password must be at least 6 characters.',
+                            ],
+                        ],
+                    ],
+
+                ],
+            'credentials do not match' =>
+                [
+                    'registerData' => [
+                        'email'    => $this->email,
+                        'password' => '123456789',
+                    ],
+
+                    'exactJson' => [
+                        'message' => 'Credentials not match',
+                        'data'=> null,
+                        'status'=> 'Error',
+                    ],
+                    'statusCode' => 401,
+                ],
+            'password is not string' =>
+                [
+                    'registerData' => [
+                        'email'    => $this->email,
+                        'password' => 123456789,
+                    ],
+
+                    'exactJson' => [
+                        'message' => 'The password must be a string.',
+                        'errors'  => [
+                            'password' => [
+                                'The password must be a string.',
+                            ],
+                        ],
+                    ],
+
+                ],
+            'email is not string' => [
+                'registerData' => [
+                    'email'    => 123456789,
+                    'password' => '123456789',
+                ],
+
+                'exactJson' => [
+                    'message' => 'The email must be a string. (and 1 more error)',
+                    'errors'  => [
+                        'email' => [
+                            'The email must be a string.',
+                            'The email must be a valid email address.'
+                        ],
+                    ],
+                ],
+
+            ],
+        ];
     }
 }
