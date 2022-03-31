@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Str;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 use Faker\Factory as Faker;
 
@@ -221,4 +222,106 @@ class AuthTest extends TestCase
                     ],
             ];
     }
+
+    /**
+     * @dataProvider ProviderLoginTests
+     */
+    public function test_loginSuccessful($loginData, $status, $jsonStructure, $assertMissing = false) {
+
+
+        $response = $this->post('api/auth/login', $loginData, ['Accept' => 'application/json']);
+
+        $response->assertStatus($status);
+        $response->assertJsonStructure($jsonStructure);
+
+        if ($assertMissing) {
+            $response->assertJson(fn (AssertableJson $json) =>
+            $json->hasAll('data', 'message', 'status')
+                ->missing('data.token')
+            );
+        }
+
+    }
+
+    public function ProviderLoginTests () {
+
+        return
+            [
+                'login successful' =>
+                    [
+                        'loginData' => ['email' => 'test@test.de',
+                        'password' => '12345678'],
+                        'status' => 200,
+                        'jsonStructure' => [
+                            "data" => [
+                                "token",
+                                ],
+                            "message",
+                            "status"
+                        ],
+                    ],
+
+                'login fail wrong pw' =>
+                    [
+                        'loginData' => [
+                            'email' => 'test@test.de',
+                            'password' => 'wrongPW'
+                        ],
+                        'status' => 401,
+                        'jsonStructure' => [
+                            "data",
+                            "message",
+                            "status"
+                        ],
+                        'assertMissing' => true,
+                    ],
+
+                'login fail user doesnt exist' =>
+                    [
+                        'loginData' => [
+                            'email' => 'test1234@test.de',
+                            'password' => '12345678'
+                        ],
+                        'status' => 401,
+                        'jsonStructure' => [
+                            "data",
+                            "message",
+                            "status"
+                        ],
+                        'assertMissing' => true,
+                    ],
+
+                'login fail validation error: no email' =>
+                    [
+                        'loginData' => [
+                            'email' => '',
+                            'password' => 'wrongPW'
+                        ],
+                        'status' => 422,
+                        'jsonStructure' => [
+                            'message',
+                            'errors' => [
+                                'email'
+                                ],
+                        ],
+                    ],
+
+                'login fail validation error: no pw' =>
+                    [
+                        'loginData' => [
+                            'email' => 'test1234@test.de',
+                            'password' => ''
+                        ],
+                        'status' => 422,
+                        'jsonStructure' => [
+                            'message',
+                            'errors' => [
+                                'password'
+                            ],
+                        ],
+                    ],
+                ];
+
+    }
+
 }
