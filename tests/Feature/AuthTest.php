@@ -433,6 +433,23 @@ class AuthTest extends TestCase
                         ],
                     ],
 
+                'password too short' =>
+                    [
+                        'credentials' => [
+                            'email' => 'test@test.de',
+                            'password' => '123'
+                        ],
+                        'expectedStatus' => 422,
+                        'expectedJson' => [
+                            'message' => 'The password must be at least 6 characters.',
+                            'errors' => [
+                                'password' => [
+                                    'The password must be at least 6 characters.',
+                                ],
+                            ],
+                        ],
+                    ],
+
                 'invalid credentials' =>
                     [
                         'credentials' => [
