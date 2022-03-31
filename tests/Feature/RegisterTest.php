@@ -6,7 +6,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use Faker\Factory as Faker;
 
-class AuthTest extends TestCase
+class RegisterTest extends TestCase
 {
 
     use DatabaseTransactions;
