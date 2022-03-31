@@ -111,6 +111,100 @@ class AuthTest extends TestCase
                         ],
 
                     ],
+                'without name string' =>
+                    [
+                        'registerData' => [
+                            'name' => '',
+                            'email' => $faker->email(),
+                            'password' => '12345678',
+                            'password_confirmation' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The name field is required.',
+                            'errors' => [
+                                'name' => [
+                                    'The name field is required.',
+                                ],
+                            ],
+                        ],
+
+                    ],
+                'name not in Response' =>
+                    [
+                        'registerData' => [
+                            'email' => $faker->email(),
+                            'password' => '12345678',
+                            'password_confirmation' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The name field is required.',
+                            'errors' => [
+                                'name' => [
+                                    'The name field is required.',
+                                ],
+                            ],
+                        ],
+
+                    ],
+                'not valid name' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->text(1000),
+                            'email' => $faker->email(),
+                            'password' => '12345678',
+                            'password_confirmation' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The name must not be greater than 255 characters.',
+                            'errors' => [
+                                'name' => [
+                                    'The name must not be greater than 255 characters.',
+                                ],
+                            ],
+                        ],
+
+                    ],
+                'email already registered' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->name(),
+                            'email' => 'test@test.de',
+                            'password' => '12345678',
+                            'password_confirmation' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The email has already been taken.',
+                            'errors' => [
+                                'email' => [
+                                    'The email has already been taken.',
+                                ],
+                            ],
+                        ],
+
+                    ],
+                'different passwords' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->name(),
+                            'email' => $faker->email(),
+                            'password' => '1234564778',
+                            'password_confirmation' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The password confirmation does not match.',
+                            'errors' => [
+                                'password' => [
+                                    'The password confirmation does not match.',
+                                ],
+                            ],
+                        ],
+
+                    ],
             ];
     }
 }
