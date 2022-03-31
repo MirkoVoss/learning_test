@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use Faker\Factory as Faker;
 
 class AuthTest extends TestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     public function test_registerSuccessfully()
     {
@@ -106,6 +106,79 @@ class AuthTest extends TestCase
                             'errors' => [
                                 'email' => [
                                     'The email field is required.',
+                                ],
+                            ],
+                        ],
+
+                    ],
+                'email already existing' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->name(),
+                            'email' => 'test@test.de',
+                            'password' => '12345678',
+                            'password_confirmation' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The email has already been taken.',
+                            'errors' => [
+                                'email' => [
+                                    'The email has already been taken.',
+                                ],
+                            ],
+                        ],
+                    ],
+                'password not matching' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->name(),
+                            'email' => $faker->unique()->safeEmail(),
+                            'password' => '12345678',
+                            'password_confirmation' => '1234567',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The password confirmation does not match.',
+                            'errors' => [
+                                'password' => [
+                                    'The password confirmation does not match.',
+                                ],
+                            ],
+                        ],
+
+                    ],
+                'password is missing' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->name(),
+                            'email' => $faker->unique()->safeEmail(),
+                            'password_confirmation' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The password field is required.',
+                            'errors' => [
+                                'password' => [
+                                    'The password field is required.',
+                                ],
+                            ],
+                        ],
+
+                    ],
+                'name is missing' =>
+                    [
+                        'registerData' => [
+                            'email' => $faker->unique()->safeEmail(),
+                            'password' => '12345678',
+                            'password_confirmation' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The name field is required.',
+                            'errors' => [
+                                'name' => [
+                                    'The name field is required.',
                                 ],
                             ],
                         ],
