@@ -56,6 +56,24 @@ class AuthTest extends TestCase
 
         return
             [
+                'without name string' =>
+                    [
+                        'registerData' => [
+                            'name' => '',
+                            'email' => $faker->unique()->safeEmail(),
+                            'password' => '12345678',
+                            'password_confirmation' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The name field is required.',
+                            'errors' => [
+                                'name' => [
+                                    'The name field is required.',
+                                ],
+                            ],
+                        ],
+                    ],
                 'without email string' =>
                     [
                         'registerData' => [
@@ -70,6 +88,42 @@ class AuthTest extends TestCase
                             'errors' => [
                                 'email' => [
                                     'The email field is required.',
+                                ],
+                            ],
+                        ],
+                    ],
+                'without password string' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->name(),
+                            'email' => $faker->unique()->safeEmail(),
+                            'password' => '',
+                            'password_confirmation' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The password field is required.',
+                            'errors' => [
+                                'password' => [
+                                    'The password field is required.',
+                                ],
+                            ],
+                        ],
+                    ],
+                'without password confirmation string' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->name(),
+                            'email' => $faker->unique()->safeEmail(),
+                            'password' => '12345678',
+                            'password_confirmation' => '',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The password confirmation does not match.',
+                            'errors' => [
+                                'password' => [
+                                    'The password confirmation does not match.',
                                 ],
                             ],
                         ],
