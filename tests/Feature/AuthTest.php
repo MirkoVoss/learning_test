@@ -50,6 +50,18 @@ class AuthTest extends TestCase
         $response->assertExactJson($exactJson);
     }
 
+    /**
+     * @dataProvider ProviderLoginTests
+     */
+
+    public function tests_login($loginData, $exactJson = null, $status)
+    {
+        $response = $this->post('api/auth/login', $loginData, ['Accept' => 'application/json']
+        );
+        $response->assertStatus($status);
+        if ($exactJson) $response->assertExactJson($exactJson);
+    }
+
     public function ProviderRegisterNotSuccessfully()
     {
         $faker = Faker::create();
@@ -225,6 +237,97 @@ class AuthTest extends TestCase
                         ],
 
                     ],
+            ];
+    }
+
+    public function ProviderLoginTests()
+    {
+        $faker = Faker::create();
+
+        return
+            [
+                'success' =>
+                    [
+                        'loginData' => [
+                            'email' => 'test@test.de',
+                            'password' => '12345678',
+                        ],
+
+                        'exactJson' => null,
+
+                        'status' => 200
+                    ],
+
+                'without password' =>
+                    [
+                        'loginData' => [
+                            'email' => 'test@test.de',
+                            'password' => '',
+                        ],
+
+                        'exactJson' => [
+                            "message" => "The password field is required.",
+                            "errors" => [
+                                "password" => [
+                                    "The password field is required."
+                                ]
+                            ]
+                        ],
+
+                        'status' => 422,
+                    ],
+
+                'without mail' =>
+                    [
+                        'loginData' => [
+                            'email' => '',
+                            'password' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            "message" => "The email field is required.",
+                            "errors" => [
+                                "email" => [
+                                    "The email field is required."
+                                ]
+                            ]
+                        ],
+
+                        'status' => 422,
+                    ],
+
+                'incorrect mail' =>
+                    [
+                        'loginData' => [
+                            'email' => 'test@test.com',
+                            'password' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'data' => null,
+                            'message' => "Credentials not match",
+                            'status' => "Error"
+                        ],
+
+                        'status' => 401,
+                    ],
+
+                'incorrect password' =>
+                    [
+                        'loginData' => [
+                            'email' => 'test@test.de',
+                            'password' => '123456789',
+                        ],
+
+                        'exactJson' => [
+                            'data' => null,
+                            'message' => "Credentials not match",
+                            'status' => "Error"
+                        ],
+
+                        'status' => 401,
+                    ],
+
             ];
     }
 }
