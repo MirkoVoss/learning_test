@@ -186,4 +186,54 @@ class AuthTest extends TestCase
                     ],
             ];
     }
+
+    public function test_loginSuccessfully()
+    {
+        $loginData = [
+            'email' => 'test@test.de',
+            'password' => '12345678',
+        ];
+        $response = $this->post('api/auth/login', $loginData, ['Accept' => 'application/json']
+        );
+        $response->assertStatus(200);
+
+        $response->assertJsonStructure([
+            'status',
+            'message',
+            'data'
+        ]);
+    }
+
+    /**
+     * @dataProvider ProviderLoginNotSuccessfully
+     */
+
+    public function test_loginNotSuccessfully($loginData, $exactJson)
+    {
+        $response = $this->post('api/auth/login', $loginData, ['Accept' => 'application/json']
+        );
+        $response->assertStatus(401);
+        $response->assertExactJson($exactJson);
+    }
+
+    public function ProviderLoginNotSuccessfully()
+    {
+
+        return
+            [
+                'wrong email or password' =>
+                    [
+                        'loginData' => [
+                            'email' => 'test@test.de',
+                            'password' => '123456781',
+                        ],
+
+                        'exactJson' => [
+                            'status' => 'Error',
+                            'message' => 'Credentials not match',
+                            'data' => null
+                        ],
+                    ],
+            ];
+    }
 }
