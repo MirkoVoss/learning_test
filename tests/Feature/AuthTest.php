@@ -50,6 +50,88 @@ class AuthTest extends TestCase
         $response->assertExactJson($exactJson);
     }
 
+    /**
+     * @dataProvider ProviderLogin
+     */
+
+    public function test_login($loginData, $exactJson, $statusCode)
+    {
+        $response = $this->post('api/auth/login', $loginData, ['Accept' => 'application/json']
+        );
+        $response->assertStatus($statusCode);
+        if($statusCode === 200){
+            $response->assertJson($exactJson);
+        }
+        else{
+            $response->assertExactJson($exactJson);
+        }
+
+    }
+
+    public function ProviderLogin()
+    {
+
+        return
+            [
+                'login successful' => [
+                    'loginData' => [
+                        'email' => 'test@test.de',
+                        'password' => '12345678',
+                    ],
+
+                    'exactJson' => [
+                        'message' => null,
+                        'status' => 'Success'
+                    ],
+                    'statusCode' => 200,
+                ],
+                'wrong email' => [
+                    'loginData' => [
+                        'email' => 'test2@test2.de',
+                        'password' => '12345678',
+                    ],
+
+                    'exactJson' => [
+                        'data'=> null,
+                        'message' => 'Credentials not match',
+                        'status' => 'Error'
+                    ],
+                    'statusCode' => 401,
+                ],
+                'wrong password' => [
+
+                    'loginData' => [
+                        'email' => 'test@test.de',
+                        'password' => '123456789',
+                    ],
+
+                    'exactJson' => [
+                        'data'=> null,
+                        'message' => 'Credentials not match',
+                        'status' => 'Error'
+                    ],
+                    'statusCode' => 401,
+                ],
+                'short password' => [
+
+                    'loginData' => [
+                        'email' => 'test@test.de',
+                        'password' => '12345',
+                    ],
+
+                    'exactJson' => [
+                        'message' => 'The password must be at least 6 characters.',
+                        'errors' => [
+                            'password' => [
+                                'The password must be at least 6 characters.',
+                            ],
+                        ],
+                    ],
+                    'statusCode' => 422,
+                ]
+            ];
+    }
+
     public function ProviderRegisterNotSuccessfully()
     {
         $faker = Faker::create();
