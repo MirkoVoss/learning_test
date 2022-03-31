@@ -111,6 +111,63 @@ class AuthTest extends TestCase
                         ],
 
                     ],
+                'email duplicatet' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->name(),
+                            'email' => 'test@test.de',
+                            'password' => '12345678',
+                            'password_confirmation' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The email has already been taken.',
+                            'errors' => [
+                                'email' => [
+                                    'The email has already been taken.',
+                                ],
+                            ],
+                        ],
+
+                    ],
+                'name not in Rasponse' =>
+                    [
+                        'registerData' => [
+                            'name' => '',
+                            'email' => $faker->email(),
+                            'password' => '12345678',
+                            'password_confirmation' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The name field is required.',
+                            'errors' => [
+                                'name' => [
+                                    'The name field is required.',
+                                ],
+                            ],
+                        ],
+
+                    ],
+                'name to long' =>
+                    [
+                        'registerData' => [
+                            'name' => 'asöknfidsbvliasdbfökngbkdshirehoghdofhohfoerihjfoirehjgoiehrjoighoisdhoihfoihopighoidhowshfgpoiuhgpierhteüiuurhtüophtpiehrgpiurehphsdbfpibdföjnadäofhp8dfhbiöwenfefladngkwrndgorejnfogjnrwojgoerjgüoprjg+pjrweäojgorewüihjgüojrew+ogjoüirehjtliäjwddpiohüeorijhtüoirjüotrhj+or',
+                            'email' => $faker->email(),
+                            'password' => '12345678',
+                            'password_confirmation' => '12345678',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The name must not be greater than 255 characters.',
+                            'errors' => [
+                                'name' => [
+                                    'The name must not be greater than 255 characters.',
+                                ],
+                            ],
+                        ],
+
+                    ],
             ];
     }
 }
