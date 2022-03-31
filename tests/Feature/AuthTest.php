@@ -2,14 +2,14 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 use Faker\Factory as Faker;
 
 class AuthTest extends TestCase
 {
-    use RefreshDatabase;
+
+    use DatabaseTransactions;
 
     public function test_registerSuccessfully()
     {
