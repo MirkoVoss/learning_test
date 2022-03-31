@@ -168,6 +168,63 @@ class AuthTest extends TestCase
                         ],
 
                     ],
+                'password not duplicated' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->name(),
+                            'email' => $faker->email(),
+                            'password' => '12345678',
+                            'password_confirmation' => '123456789',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The password confirmation does not match.',
+                            'errors' => [
+                                'password' => [
+                                    'The password confirmation does not match.',
+                                ],
+                            ],
+                        ],
+
+                    ],
+                'without password confirmation' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->name(),
+                            'email' => $faker->email(),
+                            'password' => '12345678',
+                            'password_confirmation' => '',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The password confirmation does not match.',
+                            'errors' => [
+                                'password' => [
+                                    'The password confirmation does not match.',
+                                ],
+                            ],
+                        ],
+
+                    ],
+                'without password informations' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->name(),
+                            'email' => $faker->email(),
+                            'password' => '',
+                            'password_confirmation' => '',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The password field is required.',
+                            'errors' => [
+                                'password' => [
+                                    'The password field is required.',
+                                ],
+                            ],
+                        ],
+
+                    ],
             ];
     }
 }
