@@ -330,4 +330,122 @@ class AuthTest extends TestCase
 
             ];
     }
+
+    /**
+     * @param $credentials
+     * @param $expectedStatus
+     * @param $expectedMessage
+     *
+     * @dataProvider ProviderLogin
+     */
+    public function test_login($credentials, $expectedStatus, $expectedJson) {
+        $response = $this->post('api/auth/login', $credentials, ['Accept' => 'application/json']);
+        $response->assertStatus($expectedStatus);
+
+        if ($expectedStatus === 200) {
+            $this->assertNotEmpty($response->original['data']['token']);
+        } else {
+            $response->assertExactJson($expectedJson);
+        }
+    }
+
+    public function ProviderLogin()
+    {
+        return
+            [
+                'login successfully' =>
+                    [
+                        'credentials' => [
+                            'email' => 'test@test.de',
+                            'password' => '12345678'
+                        ],
+                        'expectedStatus' => 200,
+                        'expectedJson' => [],
+                    ],
+
+                'credentials missing' =>
+                    [
+                        'credentials' => [
+
+                        ],
+                        'expectedStatus' => 422,
+                        'expectedJson' => [
+                            'message' => 'The email field is required. (and 1 more error)',
+                            'errors' => [
+                                'email' => [
+                                    'The email field is required.',
+                                ],
+                                'password' => [
+                                    'The password field is required.',
+                                ],
+                            ],
+                        ],
+                    ],
+
+                'email missing' =>
+                    [
+                        'credentials' => [
+                            'email' => '',
+                            'password' => '12345678'
+                        ],
+                        'expectedStatus' => 422,
+                        'expectedJson' => [
+                            'message' => 'The email field is required.',
+                            'errors' => [
+                                'email' => [
+                                    'The email field is required.',
+                                ],
+                            ],
+                        ],
+                    ],
+
+                'email invalid' =>
+                    [
+                        'credentials' => [
+                            'email' => 'test@',
+                            'password' => '12345678'
+                        ],
+                        'expectedStatus' => 422,
+                        'expectedJson' => [
+                            'message' => 'The email must be a valid email address.',
+                            'errors' => [
+                                'email' => [
+                                    'The email must be a valid email address.',
+                                ],
+                            ],
+                        ],
+                    ],
+
+                'password missing' =>
+                    [
+                        'credentials' => [
+                            'email' => 'test@test.de',
+                            'password' => ''
+                        ],
+                        'expectedStatus' => 422,
+                        'expectedJson' => [
+                            'message' => 'The password field is required.',
+                            'errors' => [
+                                'password' => [
+                                    'The password field is required.',
+                                ],
+                            ],
+                        ],
+                    ],
+
+                'invalid credentials' =>
+                    [
+                        'credentials' => [
+                            'email' => 'test@test.de',
+                            'password' => '123456789'
+                        ],
+                        'expectedStatus' => 401,
+                        'expectedJson' => [
+                            "data" => null,
+                            "message" => "Credentials not match",
+                            "status" => "Error",
+                        ],
+                    ],
+            ];
+    }
 }
