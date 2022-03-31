@@ -205,6 +205,25 @@ class AuthTest extends TestCase
                         ],
 
                     ],
+                'short password' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->name(),
+                            'email' => $faker->email(),
+                            'password' => '12345',
+                            'password_confirmation' => '12345',
+                        ],
+
+                        'exactJson' => [
+                            'message' => 'The password must be at least 6 characters.',
+                            'errors' => [
+                                'password' => [
+                                    'The password must be at least 6 characters.',
+                                ],
+                            ],
+                        ],
+
+                    ],
             ];
     }
 }
