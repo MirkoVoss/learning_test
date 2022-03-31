@@ -163,7 +163,24 @@ class AuthTest extends TestCase
                                 ],
                             ],
                         ],
+                    ],
+                'email already taken' =>
+                    [
+                        'registerData' => [
+                            'name' => $faker->name(),
+                            'email' => 'test@test.de',
+                            'password' => '12345678',
+                            'password_confirmation' => '12345678',
+                        ],
 
+                        'exactJson' => [
+                            'message' => 'The email has already been taken.',
+                            'errors' => [
+                                'email' => [
+                                    'The email has already been taken.',
+                                ],
+                            ],
+                        ],
                     ],
             ];
     }
